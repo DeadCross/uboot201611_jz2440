@@ -102,8 +102,8 @@ static board_info_t dm9000_info;
 
 /* function declaration ------------------------------------- */
 static int dm9000_probe(void);
-static u16 dm9000_phy_read(int);
-static void dm9000_phy_write(int, u16);
+//static u16 dm9000_phy_read(int);
+//static void dm9000_phy_write(int, u16);
 static u8 DM9000_ior(int);
 static void DM9000_iow(int reg, u8 value);
 
@@ -279,13 +279,14 @@ dm9000_reset(void)
 
 /* Initialize dm9000 board
 */
-static int dm9000_init(struct eth_device *dev, bd_t *bd)
+int dm9000_init(struct eth_device *dev, bd_t *bd)
 {
 	int i, oft, lnk;
 	u8 io_mode;
 	struct board_info *db = &dm9000_info;
 
 	DM9000_DBG("%s\n", __func__);
+printf("%s\n", __func__);
 
 	/* RESET device */
 	dm9000_reset();
@@ -341,14 +342,14 @@ static int dm9000_init(struct eth_device *dev, bd_t *bd)
 	/* Clear interrupt status */
 	DM9000_iow(DM9000_ISR, ISR_ROOS | ISR_ROS | ISR_PTS | ISR_PRS);
 
-	printf("MAC: %pM\n", dev->enetaddr);
-	if (!is_valid_ethaddr(dev->enetaddr)) {
+	printf("MAC: %pM\n", bd->bi_enetaddr);
+	if (!is_valid_ethaddr(bd->bi_enetaddr)) {
 		printf("WARNING: Bad MAC address (uninitialized EEPROM?)\n");
 	}
 
 	/* fill device MAC address registers */
 	for (i = 0, oft = DM9000_PAR; i < 6; i++, oft++)
-		DM9000_iow(oft, dev->enetaddr[i]);
+		DM9000_iow(oft, bd->bi_enetaddr[i]);
 	for (i = 0, oft = 0x16; i < 8; i++, oft++)
 		DM9000_iow(oft, 0xff);
 
@@ -363,6 +364,7 @@ static int dm9000_init(struct eth_device *dev, bd_t *bd)
 	/* Enable TX/RX interrupt mask */
 	DM9000_iow(DM9000_IMR, IMR_PAR);
 
+#if 0
 	i = 0;
 	while (!(dm9000_phy_read(1) & 0x20)) {	/* autonegation complete bit */
 		udelay(1000);
@@ -394,6 +396,7 @@ static int dm9000_init(struct eth_device *dev, bd_t *bd)
 		break;
 	}
 	printf("mode\n");
+#endif
 	return 0;
 }
 
@@ -444,6 +447,7 @@ static int dm9000_send(struct eth_device *netdev, void *packet, int length)
 */
 static void dm9000_halt(struct eth_device *netdev)
 {
+#if 0
 	DM9000_DBG("%s\n", __func__);
 
 	/* RESET devie */
@@ -451,6 +455,7 @@ static void dm9000_halt(struct eth_device *netdev)
 	DM9000_iow(DM9000_GPR, 0x01);	/* Power-Down PHY */
 	DM9000_iow(DM9000_IMR, 0x80);	/* Disable all interrupt */
 	DM9000_iow(DM9000_RCR, 0x00);	/* Disable RX */
+#endif
 }
 
 /*
@@ -583,6 +588,7 @@ DM9000_iow(int reg, u8 value)
 /*
    Read a word from phyxcer
 */
+#if 0
 static u16
 dm9000_phy_read(int reg)
 {
@@ -618,6 +624,7 @@ dm9000_phy_write(int reg, u16 value)
 	DM9000_iow(DM9000_EPCR, 0x0);	/* Clear phyxcer write command */
 	DM9000_DBG("dm9000_phy_write(reg:0x%x, value:0x%x)\n", reg, value);
 }
+#endif
 
 int dm9000_initialize(bd_t *bis)
 {

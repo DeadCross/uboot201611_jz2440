@@ -18,6 +18,8 @@
 #include <asm/byteorder.h>
 #include <environment.h>
 
+#define DEBUG
+
 #define P_ID_AMD_STD CFI_CMDSET_AMD_LEGACY
 
 /* AMD */
@@ -296,6 +298,24 @@ static const struct amd_flash_info jedec_table[] = {
 			ERASEINFO(0x02000, 2),
 			ERASEINFO(0x08000, 1),
 			ERASEINFO(0x10000, 7),
+		}
+	},
+	//our nand
+	{
+		.mfr_id		= (u16)0x00C2,
+		.dev_id		= 0x225B,
+		.name		= "MX29LV800BB",
+		.uaddr		= {
+			[1] = MTD_UADDR_0x0555_0x02AA /* x16 */
+		},
+		.DevSize	= SIZE_512KiB,
+		.CmdSet		= CFI_CMDSET_AMD_LEGACY,
+		.NumEraseRegions= 4,
+		.regions	= {
+			ERASEINFO(0x04000, 1),
+			ERASEINFO(0x02000, 2),
+			ERASEINFO(0x08000, 1),
+			ERASEINFO(0x10000, 15),
 		}
 	},
 	{

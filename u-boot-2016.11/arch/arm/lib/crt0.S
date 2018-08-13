@@ -82,15 +82,107 @@ ENTRY(_main)
 #else
 	bic	sp, sp, #7	/* 8-byte alignment for ABI compliance */
 #endif
+    /**************************
+    init LED
+    LED0 ON
+    **************************/
+    ldr	r0, =0x56000054
+    ldr	r1, =0xCF
+    str	r1, [r0]
+
+	bl uart0_init
+
+	ldr r0, =72
+	bl putc_for_test
+
+	ldr r0, =101
+	bl putc_for_test
+
+	ldr r0, =108
+	bl putc_for_test
+
+	ldr r0, =108
+	bl putc_for_test
+
+	ldr r0, =111
+	bl putc_for_test
+
+    ldr r0, =10
+	bl putc_for_test
+
+	ldr r0, =13
+	bl putc_for_test
+
+	/**************************
+	start to init nand and copy code to RAM
+	**************************/
+	bl nand_init_for_start
+
+    ldr r0, =65                 //A
+	bl putc_for_test
+
+	ldr r0, =0
+	ldr r1, =_start
+	ldr r2, =__bss_start
+    sub r2, r2, r1
+	bl copy_code_to_sdram_for_start
+
+    ldr r0, =66                 //B
+	bl putc_for_test
+
+	bl clear_bss_for_start
+
+    ldr r0, =67                  //C
+	bl putc_for_test
+
+    ldr pc, =START_ON_RAM			//start run on RAM
+START_ON_RAM:
 	mov	r0, sp
 	bl	board_init_f_alloc_reserve
 	mov	sp, r0
 	/* set up gd here, outside any C code */
 	mov	r9, r0
 	bl	board_init_f_init_reserve
+#if 1
+    ldr r0, =68                     //D
+	bl putc_for_test
+#endif
 
 	mov	r0, #0
 	bl	board_init_f
+    /***************************
+    remember the r0 r1 values
+    ***************************/
+    mov r6, r0
+    mov r7, r1
+
+#if 1
+    /**************************
+    init LED
+    LED0 ON
+    **************************/
+    ldr	r0, =0x56000054
+    ldr	r1, =0x8F
+    str	r1, [r0]
+
+    ldr r0, =69                     //E
+	bl putc_for_test
+#endif
+
+#if 0
+DeadLoop:
+    ldr r0, =0
+    b DeadLoop
+#endif
+
+    mov r0, r6
+    mov r1, r7
+
+    str	r1, [r0]
+
+    ldr r0, =70                     //F
+	bl putc_for_test
+
 
 #if ! defined(CONFIG_SPL_BUILD)
 
@@ -111,6 +203,9 @@ ENTRY(_main)
 	ldr	r9, [r9, #GD_BD]		/* r9 = gd->bd */
 	sub	r9, r9, #GD_SIZE		/* new GD is below bd */
 
+    ldr r0, =71                     //G
+	bl putc_for_test
+
 	adr	lr, here
 	ldr	r0, [r9, #GD_RELOC_OFF]		/* r0 = gd->reloc_off */
 	add	lr, lr, r0
@@ -118,17 +213,24 @@ ENTRY(_main)
 	orr	lr, #1				/* As required by Thumb-only */
 #endif
 	ldr	r0, [r9, #GD_RELOCADDR]		/* r0 = gd->relocaddr */
-	b	relocate_code
+    ldr r0, =72                     //H
+	bl putc_for_test
+//	b	relocate_code
+    ldr	r2, =__rel_dyn_start	/* r2 <- SRC &__rel_dyn_start */
+	ldr	r3, =__rel_dyn_end	/* r3 <- SRC &__rel_dyn_end */
+
+    ldr r0, =73                     //I
+	bl putc_for_test
 here:
 /*
  * now relocate vectors
  */
 
-	bl	relocate_vectors
+#	bl	relocate_vectors
 
 /* Set up final (full) environment */
 
-	bl	c_runtime_cpu_setup	/* we still call old routine here */
+#	bl	c_runtime_cpu_setup	/* we still call old routine here */
 #endif
 #if !defined(CONFIG_SPL_BUILD) || defined(CONFIG_SPL_FRAMEWORK)
 # ifdef CONFIG_SPL_BUILD
@@ -138,6 +240,8 @@ here:
 	movne	sp, r0
 	movne	r9, r0
 # endif
+
+#if 0
 	ldr	r0, =__bss_start	/* this is auto-relocated! */
 
 #ifdef CONFIG_USE_ARCH_MEMSET
@@ -158,6 +262,9 @@ clbss_l:cmp	r0, r1			/* while not at end of BSS */
 	addlo	r0, r0, #4		/* move to next */
 	blo	clbss_l
 #endif
+#endif
+    ldr r0, =74                     //J
+    bl putc_for_test
 
 #if ! defined(CONFIG_SPL_BUILD)
 	bl coloured_LED_init
@@ -171,6 +278,8 @@ clbss_l:cmp	r0, r1			/* while not at end of BSS */
 	ldr	lr, =board_init_r	/* this is auto-relocated! */
 	bx	lr
 #else
+    ldr r0, =75                     //K
+    bl putc_for_test
 	ldr	pc, =board_init_r	/* this is auto-relocated! */
 #endif
 	/* we should not return here. */

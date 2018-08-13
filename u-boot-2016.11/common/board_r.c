@@ -72,8 +72,13 @@ DECLARE_GLOBAL_DATA_PTR;
 #if defined(CONFIG_SPARC)
 extern int prom_init(void);
 #endif
+#ifdef CONFIG_DRIVER_DM9000
+	extern int dm9000_init(struct eth_device *dev, bd_t *bd);
+#endif
 
 ulong monitor_flash_len;
+
+extern int mtdparts_init(void);
 
 __weak int board_flash_wp_on(void)
 {
@@ -656,6 +661,9 @@ static int initr_net(void)
 	debug("Reset Ethernet PHY\n");
 	reset_phy();
 #endif
+#ifdef CONFIG_DRIVER_DM9000
+	dm9000_init(NULL, gd->bd);
+#endif
 	return 0;
 }
 #endif
@@ -969,6 +977,7 @@ init_fnc_t init_sequence_r[] = {
 #if defined(CONFIG_SPARC)
 	prom_init,
 #endif
+	mtdparts_init,
 	run_main_loop,
 };
 
