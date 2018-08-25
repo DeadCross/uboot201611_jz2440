@@ -99,11 +99,11 @@
 #define CONFIG_BOOT_RETRY_TIME	-1
 #define CONFIG_RESET_TO_RETRY
 #define CONFIG_BOOTARGS		"console=ttySAC0,115200 root=/dev/mtdblock3"
-#define CONFIG_BOOTCOMMAND	"nand read 30000000 kernel 0x200000;bootm 30000000"
+#define CONFIG_BOOTCOMMAND	"nand read 30000000 kernel 0x00a00000;bootm 30000000"
 
 #define CONFIG_NETMASK		255.255.255.0
-#define CONFIG_IPADDR		136.17.69.200
-#define CONFIG_SERVERIP		136.17.69.59
+#define CONFIG_IPADDR		192.168.31.240
+#define CONFIG_SERVERIP		192.168.31.26
 #define CONFIG_ETHADDR		08:00:3e:26:0a:5b
 
 #if defined(CONFIG_CMD_KGDB)
@@ -175,10 +175,10 @@
 #define CONFIG_CMD_MTDPARTS
 #define CONFIG_MTD_DEVICE
 #define CONFIG_MTD_PARTITIONS
-#define MTDIDS_DEFAULT		"nand0=jz2440"
-#define MTDPARTS_DEFAULT	"mtdparts=jz2440:512k(u-boot),"\
+#define MTDIDS_DEFAULT		"nand0=lzw2440"
+#define MTDPARTS_DEFAULT	"mtdparts=lzw2440:512k(u-boot),"\
 							"128k(params),"\
-							"4m(kernel),"\
+							"10m(kernel),"\
 							"-(rootfs)"
 /*
  * Size of malloc() pool
